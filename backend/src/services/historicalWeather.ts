@@ -91,8 +91,8 @@ class HistoricalWeatherService {
             'temperature_2m_min', 
             'temperature_2m_mean',
             'precipitation_sum',
-            'relativehumidity_2m_mean',
-            'windspeed_10m_mean',
+            'relative_humidity_2m_mean',
+            'wind_speed_10m_mean',
             'surface_pressure_mean'
           ].join(','),
           timezone: 'auto'
@@ -112,8 +112,8 @@ class HistoricalWeatherService {
         temperatureMin: data.daily.temperature_2m_min?.[index] || null,
         temperatureMean: data.daily.temperature_2m_mean?.[index] || null,
         precipitation: data.daily.precipitation_sum?.[index] || 0,
-        humidity: data.daily.relativehumidity_2m_mean?.[index] || null,
-        windSpeed: data.daily.windspeed_10m_mean?.[index] || null,
+        humidity: data.daily.relative_humidity_2m_mean?.[index] || null,
+        windSpeed: data.daily.wind_speed_10m_mean?.[index] || null,
         pressure: data.daily.surface_pressure_mean?.[index] || null
       }));
 
@@ -153,9 +153,12 @@ class HistoricalWeatherService {
 
   async getYearlyClimateData(latitude: number, longitude: number, years: number[]): Promise<YearlyClimateData[]> {
     const yearlyData: YearlyClimateData[] = [];
+    logger.info(`🏛️ Fetching yearly climate data for ${years.length} years: ${years[0]}-${years[years.length-1]}`);
 
-    for (const year of years) {
+    for (let i = 0; i < years.length; i++) {
+      const year = years[i];
       try {
+        logger.info(`📅 Processing year ${year} (${i + 1}/${years.length})`);
         const startDate = `${year}-01-01`;
         const endDate = `${year}-12-31`;
         
@@ -190,7 +193,8 @@ class HistoricalWeatherService {
         yearlyData.push(yearSummary);
         
         // Add delay to respect API rate limits (10,000/day = ~7 per minute)
-        await this.delay(10000); // 10 second delay between years
+        // Reduced delay for better user experience (while still respecting limits)
+        await this.delay(2000); // 2 second delay between years
         
       } catch (error) {
         logger.warn(`⚠️ Failed to fetch data for year ${year}:`, error);
