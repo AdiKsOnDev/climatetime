@@ -114,18 +114,19 @@ router.get('/yearly', async (req, res) => {
 
     // Validate year range
     const currentYear = new Date().getFullYear();
-    const invalidYears = yearNumbers.filter(y => y < 1940 || y >= currentYear);
+    const maxYear = currentYear - 1; // Historical data typically has 1-year delay
+    const invalidYears = yearNumbers.filter(y => y < 1940 || y > maxYear);
     
     if (invalidYears.length > 0) {
       return res.status(400).json({
-        error: `Invalid years: ${invalidYears.join(', ')}. Years must be between 1940 and ${currentYear - 1}`
+        error: `Invalid years: ${invalidYears.join(', ')}. Years must be between 1940 and ${maxYear}`
       });
     }
 
     // Limit number of years to prevent excessive API calls
-    if (yearNumbers.length > 10) {
+    if (yearNumbers.length > 50) {
       return res.status(400).json({
-        error: 'Too many years requested. Maximum 10 years per request.'
+        error: 'Too many years requested. Maximum 50 years per request.'
       });
     }
 
