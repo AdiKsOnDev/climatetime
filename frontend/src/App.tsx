@@ -2,6 +2,7 @@ import { useState } from 'react';
 import LocationInput from './components/LocationInput';
 import ClimateDisplay from './components/ClimateDisplay';
 import HistoricalClimateDisplay from './components/HistoricalClimateDisplay';
+import AIEducationInterface from './components/AIEducationInterface';
 import { LocationData, ClimateData } from './types';
 
 function App() {
@@ -9,7 +10,7 @@ function App() {
   const [climateData, setClimateData] = useState<ClimateData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'current' | 'historical'>('current');
+  const [activeTab, setActiveTab] = useState<'current' | 'historical' | 'ai'>('current');
 
   const handleLocationSubmit = async (location: string) => {
     setLoading(true);
@@ -44,7 +45,7 @@ function App() {
             🌍 ClimateTime
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Discover how climate change affects your local area with historical data analysis
+            Discover how climate change affects your local area with AI-powered historical analysis and personalized education
           </p>
         </header>
 
@@ -66,7 +67,7 @@ function App() {
                     onClick={() => setActiveTab('current')}
                     className={`px-6 py-2.5 rounded-md font-medium transition-all ${
                       activeTab === 'current'
-                        ? 'bg-white text-climate-blue shadow-sm'
+                        ? 'bg-white text-blue-600 shadow-sm'
                         : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
@@ -76,11 +77,21 @@ function App() {
                     onClick={() => setActiveTab('historical')}
                     className={`px-6 py-2.5 rounded-md font-medium transition-all ${
                       activeTab === 'historical'
-                        ? 'bg-white text-climate-blue shadow-sm'
+                        ? 'bg-white text-blue-600 shadow-sm'
                         : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
                     📊 Historical Trends
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('ai')}
+                    className={`px-6 py-2.5 rounded-md font-medium transition-all ${
+                      activeTab === 'ai'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    🤖 AI Tutor
                   </button>
                 </div>
               </div>
@@ -91,8 +102,13 @@ function App() {
                   locationData={locationData} 
                   climateData={climateData} 
                 />
-              ) : (
+              ) : activeTab === 'historical' ? (
                 <HistoricalClimateDisplay 
+                  locationData={locationData}
+                  currentClimate={climateData}
+                />
+              ) : (
+                <AIEducationInterface 
                   locationData={locationData}
                   currentClimate={climateData}
                 />
