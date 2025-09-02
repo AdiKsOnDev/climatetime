@@ -1,13 +1,17 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables FIRST before any other imports
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
 import { logger } from './utils/logger';
 import locationRoutes from './routes/location';
 import weatherRoutes from './routes/weather';
 import historicalRoutes from './routes/historical';
-
-dotenv.config();
+import aiRoutes from './routes/ai';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -22,6 +26,7 @@ app.use(express.json());
 app.use('/api/location', locationRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/historical', historicalRoutes);
+app.use('/api/ai', aiRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ 
