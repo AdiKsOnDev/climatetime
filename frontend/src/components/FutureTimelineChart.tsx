@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import { FutureClimateResponse, ClimateScenario } from '../types';
-import { TrendingUp, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 interface FutureTimelineChartProps {
   projections: FutureClimateResponse;

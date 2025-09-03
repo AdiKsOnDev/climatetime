@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertTriangle, TrendingUp, BarChart3 } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { LocationData, YearlyClimateData, DecadalClimateData, ClimateTrendData, ClimateData } from '../types';
 import TimelineChart from './TimelineChart';
 import ClimateComparison from './ClimateComparison';

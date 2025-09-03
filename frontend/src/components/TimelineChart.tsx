@@ -100,8 +100,6 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
     if (!trend) return [];
 
     const startYear = Math.min(...years);
-    const endYear = Math.max(...years);
-    const yearRange = endYear - startYear;
     
     return years.map(year => {
       const yearsFromStart = year - startYear;
