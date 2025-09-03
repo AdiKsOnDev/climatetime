@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Cloud, TrendingUp, Eye, Bot, Target, Leaf } from 'lucide-react';
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
+import { initPerformanceMonitoring } from './utils/performance';
 import LocationInput from './components/LocationInput';
 import ClimateDisplay from './components/ClimateDisplay';
 import HistoricalClimateDisplay from './components/HistoricalClimateDisplay';
@@ -18,6 +19,11 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'current' | 'historical' | 'future' | 'ai' | 'actions'>('current');
   
+  // Initialize performance monitoring
+  useEffect(() => {
+    initPerformanceMonitoring();
+  }, []);
+
   // Keyboard navigation for accessibility
   const { getTabProps } = useKeyboardNavigation({ 
     activeTab, 

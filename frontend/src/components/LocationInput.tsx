@@ -1,23 +1,44 @@
-import { useState } from 'react';
-import { MapPin } from 'lucide-react';
+import { useState, memo, useCallback } from 'react';
+import { MapPin, AlertCircle } from 'lucide-react';
+import { validateLocation, sanitizeLocation, locationRateLimiter } from '../utils/validation';
 
 interface LocationInputProps {
   onLocationSubmit: (location: string) => void;
   loading: boolean;
 }
 
-const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
+const LocationInput = memo(({ onLocationSubmit, loading }: LocationInputProps) => {
   const [location, setLocation] = useState('');
   const [geoLoading, setGeoLoading] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    if (location.trim()) {
-      onLocationSubmit(location.trim());
+    setValidationError(null);
+    
+    if (!location.trim()) {
+      setValidationError('Please enter a location');
+      return;
     }
-  };
 
-  const handleCurrentLocation = () => {
+    // Check rate limiting
+    if (!locationRateLimiter.isAllowed('location-search')) {
+      setValidationError('Too many requests. Please wait before searching again.');
+      return;
+    }
+
+    // Validate and sanitize input
+    const validation = validateLocation(location);
+    if (!validation.isValid) {
+      setValidationError(validation.error || 'Invalid location format');
+      return;
+    }
+
+    const sanitizedLocation = sanitizeLocation(location);
+    onLocationSubmit(sanitizedLocation);
+  }, [location, onLocationSubmit]);
+
+  const handleCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
       alert('Geolocation is not supported by this browser. Please enter your location manually.');
       return;
@@ -60,7 +81,7 @@ const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
         maximumAge: 300000 // 5 minutes cache
       }
     );
-  };
+  }, [onLocationSubmit]);
 
   return (
     <div className="bg-white dark:bg-gray-900/90 rounded-xl shadow-lg p-8 mb-8 border dark:border-gray-700/50 backdrop-blur-sm">
@@ -74,7 +95,10 @@ const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
             <input
               type="text"
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              onChange={(e) => {
+                setLocation(e.target.value);
+                if (validationError) setValidationError(null);
+              }}
               placeholder="Enter city, address, or coordinates"
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600/70 bg-white dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               disabled={loading || geoLoading}
@@ -110,6 +134,14 @@ const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
             </button>
           </div>
         </div>
+        
+        {/* Validation Error */}
+        {validationError && (
+          <div className="mt-3 flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+            <span role="alert">{validationError}</span>
+          </div>
+        )}
       </form>
       
       <div id="location-help" className="mt-4 space-y-2">
@@ -122,6 +154,8 @@ const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
       </div>
     </div>
   );
-};
+});
+
+LocationInput.displayName = 'LocationInput';
 
 export default LocationInput;
