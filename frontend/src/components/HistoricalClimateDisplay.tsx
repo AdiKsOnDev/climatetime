@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AlertTriangle, TrendingUp, BarChart3 } from 'lucide-react';
 import { LocationData, YearlyClimateData, DecadalClimateData, ClimateTrendData, ClimateData } from '../types';
 import TimelineChart from './TimelineChart';
 import ClimateComparison from './ClimateComparison';
@@ -157,12 +158,12 @@ const HistoricalClimateDisplay = ({ locationData, currentClimate }: HistoricalCl
 
   if (historicalData.loading) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-8">
+      <div className="bg-white dark:bg-gray-900/90 rounded-xl shadow-lg p-8 border dark:border-gray-700/50 backdrop-blur-sm">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-climate-blue mx-auto mb-4"></div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">Loading Historical Data</h3>
-          <p className="text-gray-600">Fetching climate records for {locationData.city || locationData.address}...</p>
-          <p className="text-sm text-gray-500 mt-2">This may take a few moments as we process multiple years of data</p>
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">Loading Historical Data</h3>
+          <p className="text-gray-600 dark:text-gray-300">Fetching climate records for {locationData.city || locationData.address}...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">This may take a few moments as we process multiple years of data</p>
         </div>
       </div>
     );
@@ -170,11 +171,11 @@ const HistoricalClimateDisplay = ({ locationData, currentClimate }: HistoricalCl
 
   if (historicalData.error) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-8">
+      <div className="bg-white dark:bg-gray-900/90 rounded-xl shadow-lg p-8 border dark:border-gray-700/50 backdrop-blur-sm">
         <div className="text-center">
-          <div className="text-4xl mb-4">⚠️</div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">Unable to Load Historical Data</h3>
-          <p className="text-gray-600 mb-4">{historicalData.error}</p>
+          <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-yellow-500 dark:text-yellow-400" />
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">Unable to Load Historical Data</h3>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">{historicalData.error}</p>
           <button
             onClick={fetchHistoricalData}
             className="px-6 py-2 bg-climate-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -188,7 +189,7 @@ const HistoricalClimateDisplay = ({ locationData, currentClimate }: HistoricalCl
 
   if (historicalData.yearlyData.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-8">
+      <div className="bg-white dark:bg-gray-900/90 rounded-xl shadow-lg p-8 border dark:border-gray-700/50 backdrop-blur-sm">
         <div className="text-center">
           <div className="text-4xl mb-4">📊</div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">No Historical Data Available</h3>
