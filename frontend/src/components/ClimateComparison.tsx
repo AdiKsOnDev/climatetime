@@ -9,6 +9,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -33,9 +34,9 @@ interface ClimateComparisonProps {
 const ClimateComparison = ({ yearlyData, decadalData, currentClimate }: ClimateComparisonProps) => {
   if (!yearlyData?.length && !decadalData?.length) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Climate Comparison</h3>
-        <div className="text-center py-8 text-gray-500">
+      <div className="bg-white dark:bg-gray-900/90 backdrop-blur-sm border dark:border-gray-700/50 rounded-xl shadow-lg p-6">
+        <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Climate Comparison</h3>
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
           No historical data available for comparison
         </div>
       </div>
@@ -152,18 +153,27 @@ const ClimateComparison = ({ yearlyData, decadalData, currentClimate }: ClimateC
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+        },
       },
     },
     scales: {
       y: {
         beginAtZero: true,
         grid: {
-          color: 'rgba(0, 0, 0, 0.1)',
+          color: document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        },
+        ticks: {
+          color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280',
         },
       },
       x: {
         grid: {
           display: false,
+        },
+        ticks: {
+          color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280',
         },
       },
     },
@@ -176,19 +186,19 @@ const ClimateComparison = ({ yearlyData, decadalData, currentClimate }: ClimateC
       formatted: `${change > 0 ? '+' : ''}${change.toFixed(1)}%`,
       color: Math.abs(change) < 5 ? 'text-green-600' : 
              change > 0 ? 'text-red-600' : 'text-blue-600',
-      icon: Math.abs(change) < 5 ? '↔️' : 
-            change > 0 ? '↗️' : '↘️'
+      icon: Math.abs(change) < 5 ? <ArrowRight className="w-4 h-4 inline" /> : 
+            change > 0 ? <TrendingUp className="w-4 h-4 inline" /> : <TrendingDown className="w-4 h-4 inline" />
     };
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6">Climate Comparison: Then vs Now</h3>
+    <div className="bg-white dark:bg-gray-900/90 backdrop-blur-sm border dark:border-gray-700/50 rounded-xl shadow-lg p-6">
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">Climate Comparison: Then vs Now</h3>
 
       {/* Decadal Comparison */}
       {decadalComparison && (
         <div className="mb-8">
-          <h4 className="text-lg font-medium text-gray-700 mb-4">
+          <h4 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">
             Decadal Comparison: {decadalComparison.earliest.decadeStart}s vs {decadalComparison.latest.decadeStart}s
           </h4>
           
@@ -207,8 +217,8 @@ const ClimateComparison = ({ yearlyData, decadalData, currentClimate }: ClimateC
 
           {/* Decadal Change Summary */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-3 bg-blue-50 rounded-lg">
-              <div className="text-sm text-gray-600">Temperature Change</div>
+            <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <div className="text-sm text-gray-600 dark:text-gray-300">Temperature Change</div>
               <div className={`text-lg font-bold ${
                 calculateChange(
                   decadalComparison.earliest.temperatureMeanAvg,
@@ -225,8 +235,8 @@ const ClimateComparison = ({ yearlyData, decadalData, currentClimate }: ClimateC
               </div>
             </div>
 
-            <div className="text-center p-3 bg-green-50 rounded-lg">
-              <div className="text-sm text-gray-600">Precipitation Change</div>
+            <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <div className="text-sm text-gray-600 dark:text-gray-300">Precipitation Change</div>
               <div className={`text-lg font-bold ${
                 calculateChange(
                   decadalComparison.earliest.precipitationTotalAvg,
@@ -243,8 +253,8 @@ const ClimateComparison = ({ yearlyData, decadalData, currentClimate }: ClimateC
               </div>
             </div>
 
-            <div className="text-center p-3 bg-yellow-50 rounded-lg">
-              <div className="text-sm text-gray-600">Humidity Change</div>
+            <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+              <div className="text-sm text-gray-600 dark:text-gray-300">Humidity Change</div>
               <div className={`text-lg font-bold ${
                 calculateChange(
                   decadalComparison.earliest.humidityAvg,
@@ -261,8 +271,8 @@ const ClimateComparison = ({ yearlyData, decadalData, currentClimate }: ClimateC
               </div>
             </div>
 
-            <div className="text-center p-3 bg-purple-50 rounded-lg">
-              <div className="text-sm text-gray-600">Wind Speed Change</div>
+            <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <div className="text-sm text-gray-600 dark:text-gray-300">Wind Speed Change</div>
               <div className={`text-lg font-bold ${
                 calculateChange(
                   decadalComparison.earliest.windSpeedAvg,
@@ -285,7 +295,7 @@ const ClimateComparison = ({ yearlyData, decadalData, currentClimate }: ClimateC
       {/* Yearly Comparison */}
       {yearlyComparison && !decadalComparison && (
         <div className="mb-6">
-          <h4 className="text-lg font-medium text-gray-700 mb-4">
+          <h4 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">
             Period Comparison: {yearlyComparison.earliest.period} vs {yearlyComparison.latest.period}
           </h4>
           
@@ -305,9 +315,9 @@ const ClimateComparison = ({ yearlyData, decadalData, currentClimate }: ClimateC
       )}
 
       {/* Climate Impact Summary */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg">
-        <h5 className="font-semibold text-gray-800 mb-2">Key Climate Insights</h5>
-        <div className="text-sm text-gray-700 space-y-1">
+      <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-lg">
+        <h5 className="font-semibold text-gray-800 dark:text-white mb-2">Key Climate Insights</h5>
+        <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
           <div>📊 Data spans {yearlyData?.length || 0} years of climate records</div>
           {decadalComparison && (
             <div>🌡️ Temperature trend: {
