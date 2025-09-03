@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MapPin } from 'lucide-react';
 
 interface LocationInputProps {
   onLocationSubmit: (location: string) => void;
@@ -33,8 +34,8 @@ const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+    <div className="bg-white dark:bg-gray-900/90 rounded-xl shadow-lg p-8 mb-8 border dark:border-gray-700/50 backdrop-blur-sm">
+      <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
         Enter Your Location
       </h2>
       
@@ -46,7 +47,7 @@ const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Enter city, address, or coordinates"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-climate-blue focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600/70 bg-white dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-climate-blue focus:border-transparent outline-none transition-all"
               disabled={loading}
             />
           </div>
@@ -55,7 +56,7 @@ const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
             <button
               type="submit"
               disabled={loading || !location.trim()}
-              className="px-6 py-3 bg-climate-blue text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
+              className="px-6 py-3 bg-climate-blue dark:bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
             >
               {loading ? 'Loading...' : 'Search'}
             </button>
@@ -64,16 +65,16 @@ const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
               type="button"
               onClick={handleCurrentLocation}
               disabled={loading}
-              className="px-4 py-3 bg-climate-green text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="px-4 py-3 bg-climate-green dark:bg-green-600 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               title="Use current location"
             >
-              📍
+              <MapPin className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
       </form>
       
-      <div className="mt-4 text-sm text-gray-500 text-center">
+      <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">
         Try: "San Francisco, CA", "London, UK", or "40.7128, -74.0060"
       </div>
     </div>
