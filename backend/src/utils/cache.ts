@@ -2,7 +2,7 @@ import { logger } from './logger';
 
 // Simple in-memory cache for development
 // In production, this would use Redis or another persistent cache
-class MemoryCache {
+export class MemoryCache {
   private cache = new Map<string, { data: any; expiry: number }>();
   private readonly defaultTTL = 3600000; // 1 hour in milliseconds
 
@@ -77,6 +77,16 @@ class MemoryCache {
   generateHistoricalKey(lat: number, lon: number, startYear: number, endYear: number): string {
     return this.generateLocationKey(lat, lon, 'historical', `${startYear}-${endYear}`);
   }
+
+  // Generate cache key for future projection queries
+  generateFutureProjectionsKey(lat: number, lon: number, scenario: string): string {
+    return this.generateLocationKey(lat, lon, 'future-projections', scenario);
+  }
+
+  // Generate cache key for all scenarios comparison
+  generateAllScenariosKey(lat: number, lon: number): string {
+    return this.generateLocationKey(lat, lon, 'all-scenarios');
+  }
 }
 
 // Singleton instance
@@ -93,5 +103,6 @@ export const CACHE_TTL = {
   CURRENT_WEATHER: 15 * 60 * 1000,   // 15 minutes - weather updates frequently
   HISTORICAL_DAILY: 24 * 60 * 60 * 1000,  // 24 hours - daily historical data is static
   HISTORICAL_YEARLY: 7 * 24 * 60 * 60 * 1000,  // 7 days - yearly data is very stable
-  CLIMATE_TRENDS: 30 * 24 * 60 * 60 * 1000     // 30 days - trend analysis is computationally expensive
+  CLIMATE_TRENDS: 30 * 24 * 60 * 60 * 1000,    // 30 days - trend analysis is computationally expensive
+  FUTURE_PROJECTIONS: 7 * 24 * 60 * 60 * 1000  // 7 days - future projections are stable
 };
