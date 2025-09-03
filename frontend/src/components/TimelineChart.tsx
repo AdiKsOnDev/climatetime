@@ -12,6 +12,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { useState } from 'react';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -148,6 +149,9 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+        },
       },
       title: {
         display: true,
@@ -156,6 +160,7 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
           size: 16,
           weight: 'bold' as const,
         },
+        color: document.documentElement.classList.contains('dark') ? '#f9fafb' : '#111827',
       },
       tooltip: {
         callbacks: {
@@ -177,19 +182,27 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
       x: {
         title: {
           display: true,
-          text: 'Year'
+          text: 'Year',
+          color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280',
         },
         grid: {
           display: false,
+        },
+        ticks: {
+          color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280',
         },
       },
       y: {
         title: {
           display: true,
-          text: getMetricLabel(selectedMetric)
+          text: getMetricLabel(selectedMetric),
+          color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280',
         },
         grid: {
-          color: 'rgba(0, 0, 0, 0.1)',
+          color: document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        },
+        ticks: {
+          color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280',
         },
       },
     },
@@ -198,13 +211,13 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
   const currentTrend = getMetricTrend(selectedMetric);
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-white dark:bg-gray-900/90 backdrop-blur-sm border dark:border-gray-700/50 rounded-xl shadow-lg p-6">
       <div className="mb-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <h3 className="text-xl font-semibold text-gray-800">Historical Climate Timeline</h3>
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Historical Climate Timeline</h3>
           
           <div className="flex items-center gap-2">
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               <input
                 type="checkbox"
                 checked={showTrend}
@@ -225,7 +238,7 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 selectedMetric === metric
                   ? 'bg-climate-blue text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               {getMetricLabel(metric).split(' ')[0]}
@@ -241,8 +254,8 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
 
       {/* Trend Analysis */}
       {currentTrend && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold text-gray-800 mb-3">
+        <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+          <h4 className="font-semibold text-gray-800 dark:text-white mb-3">
             Trend Analysis ({currentTrend.periodStart} - {currentTrend.periodEnd})
           </h4>
           
@@ -253,11 +266,11 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
                 currentTrend.trendDirection === 'decreasing' ? 'text-blue-600' :
                 'text-gray-600'
               }`}>
-                {currentTrend.trendDirection === 'increasing' ? '📈' :
-                 currentTrend.trendDirection === 'decreasing' ? '📉' : '➡️'}
+                {currentTrend.trendDirection === 'increasing' ? <TrendingUp className="w-8 h-8" /> :
+                 currentTrend.trendDirection === 'decreasing' ? <TrendingDown className="w-8 h-8" /> : <Minus className="w-8 h-8" />}
               </div>
               <div className="font-medium capitalize">{currentTrend.trendDirection}</div>
-              <div className="text-gray-600">Direction</div>
+              <div className="text-gray-600 dark:text-gray-400">Direction</div>
             </div>
             
             <div className="text-center">
@@ -267,8 +280,8 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
               }`}>
                 {currentTrend.percentChange > 0 ? '+' : ''}{currentTrend.percentChange.toFixed(1)}%
               </div>
-              <div className="font-medium">Total Change</div>
-              <div className="text-gray-600">
+              <div className="font-medium dark:text-gray-200">Total Change</div>
+              <div className="text-gray-600 dark:text-gray-400">
                 {currentTrend.baselineValue.toFixed(1)} → {currentTrend.currentValue.toFixed(1)}
               </div>
             </div>
@@ -280,15 +293,15 @@ const TimelineChart = ({ yearlyData, trends }: TimelineChartProps) => {
               }`}>
                 {currentTrend.confidenceLevel.toFixed(0)}%
               </div>
-              <div className="font-medium">Confidence</div>
-              <div className="text-gray-600">Statistical</div>
+              <div className="font-medium dark:text-gray-200">Confidence</div>
+              <div className="text-gray-600 dark:text-gray-400">Statistical</div>
             </div>
           </div>
         </div>
       )}
 
       {/* Data Summary */}
-      <div className="mt-4 text-xs text-gray-500 text-center">
+      <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
         Displaying {sortedData.length} years of data ({Math.min(...years)} - {Math.max(...years)})
         {trends && ` • Trend analysis based on ${sortedData.length} data points`}
       </div>
