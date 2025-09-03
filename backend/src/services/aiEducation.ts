@@ -2,11 +2,48 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger';
 import { ClimateData, LocationData, YearlyClimateData, ClimateTrendData } from '../types/climate';
 
+export interface ProjectionPeriod {
+  period: '2020s' | '2030s' | '2040s' | '2050s';
+  startYear: number;
+  endYear: number;
+  temperatureMaxAvg: number;
+  temperatureMinAvg: number;
+  temperatureMeanAvg: number;
+  precipitationTotal: number;
+  precipitationAvg: number;
+  changeFromBaseline: {
+    temperature: number;
+    precipitation: number;
+  };
+  uncertaintyRange: {
+    temperatureLow: number;
+    temperatureHigh: number;
+    precipitationLow: number;
+    precipitationHigh: number;
+  };
+}
+
+export interface FutureClimateData {
+  scenario: 'optimistic' | 'moderate' | 'pessimistic';
+  model: string;
+  projectionPeriods: ProjectionPeriod[];
+  baseline: {
+    period: string;
+    temperatureMean: number;
+    precipitation: number;
+  };
+  metadata: {
+    dataSource: string;
+    confidenceLevel: string;
+  };
+}
+
 export interface ClimateContext {
   location: LocationData;
   currentClimate?: ClimateData;
   historicalData?: YearlyClimateData[];
   trends?: ClimateTrendData[];
+  futureProjections?: FutureClimateData;
   timeRange?: string;
 }
 
@@ -149,6 +186,30 @@ LOCATION CONTEXT:
       prompt += '\n';
     }
 
+    // Add future projections context if available
+    if (context.futureProjections) {
+      const projections = context.futureProjections;
+      prompt += `FUTURE CLIMATE PROJECTIONS (${projections.scenario.toUpperCase()} SCENARIO):
+- Climate Model: ${projections.model}
+- Data Source: ${projections.metadata.dataSource}
+- Confidence Level: ${projections.metadata.confidenceLevel}
+- Baseline Period: ${projections.baseline.period}
+
+PROJECTED CHANGES:
+`;
+      projections.projectionPeriods.forEach(period => {
+        const tempChange = period.changeFromBaseline.temperature;
+        const precipChange = period.changeFromBaseline.precipitation;
+        const tempUncertainty = period.uncertaintyRange.temperatureHigh - period.uncertaintyRange.temperatureLow;
+        
+        prompt += `- ${period.period} (${period.startYear}-${period.endYear}): 
+  • Temperature: ${tempChange > 0 ? '+' : ''}${tempChange.toFixed(1)}°C (uncertainty: ±${(tempUncertainty/2).toFixed(1)}°C)
+  • Precipitation: ${precipChange > 0 ? '+' : ''}${precipChange.toFixed(1)}%
+`;
+      });
+      prompt += '\n';
+    }
+
     // Add conversation context if available
     if (previousConversation && previousConversation.length > 0) {
       prompt += `CONVERSATION HISTORY:
@@ -174,7 +235,7 @@ USER QUESTION: "${question}"
 
 Please provide a comprehensive response in the following JSON format:
 {
-  "explanation": "Your detailed explanation here",
+  "explanation": "Your detailed explanation here in markdown format. Use headers, bold text, lists, and other markdown formatting for better readability.",
   "relatedConcepts": ["concept1", "concept2", "concept3"],
   "followUpSuggestions": ["suggestion1", "suggestion2", "suggestion3"],
   "confidenceLevel": 85,
@@ -186,7 +247,13 @@ Focus on:
 2. Connecting the data to broader climate science concepts
 3. Explaining any trends or changes in accessible terms
 4. Providing actionable insights where relevant
-5. Maintaining scientific accuracy while matching the complexity level`;
+5. Maintaining scientific accuracy while matching the complexity level
+6. Format your explanation using markdown for better readability:
+   - Use ## for section headers
+   - Use **bold** for emphasis
+   - Use bullet points (-) for lists
+   - Use numbers (1., 2., 3.) for ordered lists
+   - Use > for important quotes or key takeaways`;
 
     return prompt;
   }
@@ -230,7 +297,15 @@ Focus on:
   private getMockExplanation(request: AIExplanationRequest): AIExplanationResponse {
     const mockExplanations = {
       beginner: {
-        explanation: `Based on the climate data for ${request.context.location.address}, I can see some interesting patterns. Climate change affects different places in different ways. Your location shows changes over time that are part of larger global trends. Think of climate like a giant system where small changes can add up to big differences over many years.`,
+        explanation: `## Climate Patterns in Your Area
+
+Based on the climate data for **${request.context.location.address}**, I can see some interesting patterns:
+
+- Climate change affects different places in different ways
+- Your location shows changes over time that are part of larger global trends
+- Think of climate like a giant system where small changes can add up to big differences over many years
+
+> **Key Point**: Local climate changes are connected to global climate patterns, but each location experiences unique impacts.`,
         relatedConcepts: ['Global Warming', 'Climate Patterns', 'Temperature Trends'],
         followUpSuggestions: [
           'How has temperature changed in my area?',
@@ -239,7 +314,20 @@ Focus on:
         ]
       },
       intermediate: {
-        explanation: `The climate data for ${request.context.location.address} demonstrates regional manifestations of global climate change. Local temperature and precipitation patterns are influenced by both global trends and regional factors like geography, ocean currents, and urbanization. The observed changes align with climate model predictions for this region.`,
+        explanation: `## Regional Climate Analysis for ${request.context.location.address}
+
+The climate data demonstrates **regional manifestations of global climate change**:
+
+### Key Factors Influencing Local Climate:
+- Global warming trends
+- Regional geographic features
+- Ocean current patterns  
+- Urban heat island effects
+
+### What This Means:
+The observed changes align with **climate model predictions** for this region. Local temperature and precipitation patterns reflect both global trends and unique regional characteristics.
+
+> **Important**: Regional climate patterns can amplify or moderate global climate signals.`,
         relatedConcepts: ['Regional Climate Variability', 'Climate Forcing', 'Urban Heat Island'],
         followUpSuggestions: [
           'What drives these local climate changes?',
@@ -248,7 +336,21 @@ Focus on:
         ]
       },
       advanced: {
-        explanation: `The climatological data for ${request.context.location.address} exhibits trends consistent with anthropogenic climate forcing. Statistical analysis of the temperature time series shows warming trends with confidence intervals that exceed natural variability. The precipitation patterns suggest potential shifts in regional hydroclimate dynamics, possibly linked to changes in atmospheric circulation patterns.`,
+        explanation: `## Climatological Analysis for ${request.context.location.address}
+
+### Statistical Trends
+The climatological data exhibits trends **consistent with anthropogenic climate forcing**:
+
+1. **Temperature Analysis**: Time series shows warming trends with confidence intervals exceeding natural variability
+2. **Precipitation Patterns**: Suggest potential shifts in regional hydroclimate dynamics
+3. **Circulation Changes**: Possibly linked to alterations in atmospheric circulation patterns
+
+### Statistical Significance
+- Trends exceed background natural variability
+- Confidence intervals support attribution to human activities
+- Regional patterns align with IPCC projections
+
+> **Research Finding**: The observed changes represent statistically significant departures from historical baseline conditions.`,
         relatedConcepts: ['Anthropogenic Forcing', 'Statistical Significance', 'Hydroclimate Dynamics'],
         followUpSuggestions: [
           'What is the statistical significance of these trends?',
@@ -301,7 +403,48 @@ Focus on:
       suggestions.push(`Why is it ${context.currentClimate.current.description.toLowerCase()} today?`);
     }
 
-    return suggestions.slice(0, 6); // Return top 6 suggestions
+    // Add future projections-specific suggestions
+    if (context.futureProjections) {
+      const projections = context.futureProjections;
+      const lastPeriod = projections.projectionPeriods[projections.projectionPeriods.length - 1];
+      
+      if (lastPeriod) {
+        const tempChange = lastPeriod.changeFromBaseline.temperature;
+        const precipChange = lastPeriod.changeFromBaseline.precipitation;
+        
+        // Temperature-related questions
+        if (tempChange > 2) {
+          suggestions.unshift(`Why is my area projected to warm by ${tempChange.toFixed(1)}°C by the 2050s?`);
+        } else if (tempChange > 0) {
+          suggestions.unshift('What does moderate warming mean for my daily life?');
+        }
+        
+        // Precipitation-related questions
+        if (Math.abs(precipChange) > 10) {
+          const direction = precipChange > 0 ? 'increase' : 'decrease';
+          suggestions.push(`How will the projected ${direction} in precipitation affect my area?`);
+        }
+        
+        // Scenario-specific questions
+        if (projections.scenario === 'optimistic') {
+          suggestions.push('What needs to happen to achieve this optimistic climate scenario?');
+        } else if (projections.scenario === 'pessimistic') {
+          suggestions.push('What can we do to avoid this pessimistic climate scenario?');
+        } else {
+          suggestions.push('How likely is this moderate climate scenario to occur?');
+        }
+        
+        // Uncertainty and confidence questions
+        suggestions.push('How confident are scientists about these future projections?');
+        suggestions.push('What factors could make these projections more or less severe?');
+      }
+      
+      // Model and methodology questions
+      suggestions.push(`How do climate models like ${projections.model} make predictions?`);
+      suggestions.push('How do different climate scenarios compare for my location?');
+    }
+
+    return suggestions.slice(0, 8); // Return top 8 suggestions to accommodate future projections
   }
 }
 
