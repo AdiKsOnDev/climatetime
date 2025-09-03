@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { LocationData, YearlyClimateData, DecadalClimateData, ClimateTrendData, ClimateData } from '../types';
-import TimelineChart from './TimelineChart';
+import { SuspendedTimelineChart } from './LazyChartComponents';
 import ClimateComparison from './ClimateComparison';
 
 interface HistoricalClimateDisplayProps {
@@ -261,7 +261,7 @@ const HistoricalClimateDisplay = ({ locationData, currentClimate }: HistoricalCl
       </div>
 
       {/* Timeline Chart */}
-      <TimelineChart 
+      <SuspendedTimelineChart 
         yearlyData={historicalData.yearlyData}
         trends={historicalData.trends}
       />

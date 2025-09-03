@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Gem, TrendingUp, RotateCcw, AlertTriangle, Info } from 'lucide-react';
 import { LocationData, ClimateScenario, FutureClimateResponse, ScenarioComparison } from '../types';
-import FutureTimelineChart from './FutureTimelineChart';
-import ScenarioComparisonChart from './ScenarioComparisonChart';
+import { SuspendedFutureTimelineChart, SuspendedScenarioComparisonChart } from './LazyChartComponents';
 
 interface FutureClimateDisplayProps {
   locationData: LocationData;
@@ -239,7 +238,7 @@ const FutureClimateDisplay = ({ locationData }: FutureClimateDisplayProps) => {
               </div>
 
               {/* Timeline Visualization */}
-              <FutureTimelineChart
+              <SuspendedFutureTimelineChart
                 projections={futureData.projections}
                 scenario={selectedScenario}
               />
@@ -289,7 +288,7 @@ const FutureClimateDisplay = ({ locationData }: FutureClimateDisplayProps) => {
           ) : (
             // Scenario Comparison View
             futureData.scenarios && (
-              <ScenarioComparisonChart scenarios={futureData.scenarios} />
+              <SuspendedScenarioComparisonChart scenarios={futureData.scenarios} />
             )
           )}
 
