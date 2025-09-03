@@ -12,6 +12,8 @@ import locationRoutes from './routes/location';
 import weatherRoutes from './routes/weather';
 import historicalRoutes from './routes/historical';
 import aiRoutes from './routes/ai';
+import futureRoutes from './routes/future';
+import actionsRoutes from './routes/actions';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,6 +29,8 @@ app.use('/api/location', locationRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/historical', historicalRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/future', futureRoutes);
+app.use('/api/actions', actionsRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ 
