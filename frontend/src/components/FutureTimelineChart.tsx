@@ -1,7 +1,29 @@
 import { useEffect, useRef } from 'react';
-import Chart from 'chart.js/auto';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
 import { FutureClimateResponse, ClimateScenario } from '../types';
 import { Info } from 'lucide-react';
+
+// Register only the components we need
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 interface FutureTimelineChartProps {
   projections: FutureClimateResponse;
@@ -10,7 +32,7 @@ interface FutureTimelineChartProps {
 
 const FutureTimelineChart = ({ projections, scenario }: FutureTimelineChartProps) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<Chart | null>(null);
+  const chartInstanceRef = useRef<ChartJS | null>(null);
 
   useEffect(() => {
     if (!chartRef.current || !projections) return;
@@ -80,7 +102,7 @@ const FutureTimelineChart = ({ projections, scenario }: FutureTimelineChartProps
       ...periods.map(p => p.changeFromBaseline.precipitation)
     ];
 
-    chartInstanceRef.current = new Chart(ctx, {
+    chartInstanceRef.current = new ChartJS(ctx, {
       type: 'line',
       data: {
         labels: allLabels,

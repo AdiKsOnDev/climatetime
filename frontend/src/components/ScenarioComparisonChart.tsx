@@ -1,7 +1,27 @@
 import { useEffect, useRef } from 'react';
-import Chart from 'chart.js/auto';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import { ScenarioComparison } from '../types';
 import { Sprout, Scale, Flame, BarChart3 } from 'lucide-react';
+
+// Register only the components we need
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface ScenarioComparisonChartProps {
   scenarios: ScenarioComparison;
@@ -9,7 +29,7 @@ interface ScenarioComparisonChartProps {
 
 const ScenarioComparisonChart = ({ scenarios }: ScenarioComparisonChartProps) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<Chart | null>(null);
+  const chartInstanceRef = useRef<ChartJS | null>(null);
 
   useEffect(() => {
     if (!chartRef.current || !scenarios) return;
@@ -65,7 +85,7 @@ const ScenarioComparisonChart = ({ scenarios }: ScenarioComparisonChartProps) =>
       return p?.changeFromBaseline.precipitation || 0;
     });
 
-    chartInstanceRef.current = new Chart(ctx, {
+    chartInstanceRef.current = new ChartJS(ctx, {
       type: 'line',
       data: {
         labels,
@@ -171,7 +191,7 @@ const ScenarioComparisonChart = ({ scenarios }: ScenarioComparisonChartProps) =>
               padding: 15,
               color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
               generateLabels: (chart) => {
-                const labels = Chart.defaults.plugins.legend.labels.generateLabels?.(chart) || [];
+                const labels = ChartJS.defaults.plugins.legend.labels.generateLabels?.(chart) || [];
                 // Group labels by variable type
                 const tempLabels = labels.filter(label => label.text?.includes('Temperature'));
                 const precipLabels = labels.filter(label => label.text?.includes('Precipitation'));
