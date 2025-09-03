@@ -8,6 +8,7 @@ interface LocationInputProps {
 
 const LocationInput = ({ onLocationSubmit, loading }: LocationInputProps) => {
   const [location, setLocation] = useState('');
+  const [geoLoading, setGeoLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
