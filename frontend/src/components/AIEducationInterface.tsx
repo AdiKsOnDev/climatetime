@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Bot, MessageCircle, Lightbulb, AlertTriangle, Send, Loader2, Leaf } from 'lucide-react';
 import { LocationData, ClimateData, YearlyClimateData, ClimateTrendData } from '../types';
 
 interface AIEducationInterfaceProps {
@@ -200,27 +202,30 @@ const AIEducationInterface = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 h-full flex flex-col">
+    <div className="bg-white dark:bg-gray-900/90 backdrop-blur-sm border dark:border-gray-700/50 rounded-lg shadow-lg p-6 h-full flex flex-col">
       {/* Header */}
-      <div className="flex justify-between items-start mb-6 border-b pb-4">
+      <div className="flex justify-between items-start mb-6 border-b dark:border-gray-700/50 pb-4">
         <div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            🤖 AI Climate Tutor
-          </h3>
-          <p className="text-gray-600 text-sm">
+          <div className="flex items-center gap-2 mb-2">
+            <Bot className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              AI Climate Tutor
+            </h3>
+          </div>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">
             Ask questions about the climate data for {locationData.address}
           </p>
         </div>
         
         {/* Complexity Level Selector */}
         <div className="flex flex-col items-end">
-          <label className="text-sm font-medium text-gray-700 mb-1">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Explanation Level
           </label>
           <select
             value={complexityLevel}
             onChange={(e) => setComplexityLevel(e.target.value as ComplexityLevel)}
-            className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             {Object.entries(complexityLevelInfo).map(([level, info]) => (
               <option key={level} value={level}>
@@ -228,7 +233,7 @@ const AIEducationInterface = ({
               </option>
             ))}
           </select>
-          <p className="text-xs text-gray-500 mt-1 text-right max-w-32">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right max-w-32">
             {complexityLevelInfo[complexityLevel].description}
           </p>
         </div>
@@ -238,15 +243,17 @@ const AIEducationInterface = ({
       <div className="flex-1 overflow-y-auto mb-4 space-y-4 max-h-96">
         {conversation.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-6xl mb-4">🌱</div>
-            <h4 className="text-lg font-medium text-gray-900 mb-2">
+            <div className="flex justify-center mb-4">
+              <Leaf className="w-16 h-16 text-green-600 dark:text-green-400" />
+            </div>
+            <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Welcome to AI Climate Education!
             </h4>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
               I can help you understand the climate data for your location. Ask me anything about:
             </p>
             <div className="text-left inline-block">
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
                 <li>• Historical climate trends and changes</li>
                 <li>• What the data means for your local environment</li>
                 <li>• How your area compares to global patterns</li>
@@ -263,31 +270,37 @@ const AIEducationInterface = ({
               <div
                 className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-lg ${
                   turn.role === 'user'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-blue-600 dark:bg-blue-700 text-white'
                     : turn.isLoading
-                    ? 'bg-gray-100 text-gray-600'
-                    : 'bg-gray-100 text-gray-900'
+                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
                 }`}
               >
                 <div className="text-sm">
                   {turn.isLoading ? (
                     <div className="flex items-center space-x-2">
-                      <div className="animate-spin h-4 w-4 border-2 border-gray-400 rounded-full border-t-transparent"></div>
+                      <Loader2 className="h-4 w-4 animate-spin text-gray-400 dark:text-gray-500" />
                       <span>{turn.content}</span>
                     </div>
                   ) : (
                     <div>
-                      <p className="whitespace-pre-wrap">{turn.content}</p>
+                      <div className={`prose prose-sm max-w-none ${
+                        turn.role === 'user' 
+                          ? 'prose-headings:text-white prose-p:text-white prose-strong:text-white prose-ul:text-white prose-ol:text-white' 
+                          : 'prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-900 dark:prose-p:text-white prose-strong:text-gray-900 dark:prose-strong:text-white prose-ul:text-gray-900 dark:prose-ul:text-white prose-ol:text-gray-900 dark:prose-ol:text-white'
+                      }`}>
+                        <ReactMarkdown>{turn.content}</ReactMarkdown>
+                      </div>
                       
                       {/* Related Concepts */}
                       {turn.relatedConcepts && turn.relatedConcepts.length > 0 && (
-                        <div className="mt-3 pt-2 border-t border-gray-200">
-                          <p className="text-xs font-medium text-gray-700 mb-1">Related concepts:</p>
+                        <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-600">
+                          <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Related concepts:</p>
                           <div className="flex flex-wrap gap-1">
                             {turn.relatedConcepts.map((concept, i) => (
                               <span
                                 key={i}
-                                className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs"
+                                className="inline-block bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-1 rounded text-xs"
                               >
                                 {concept}
                               </span>
@@ -298,17 +311,18 @@ const AIEducationInterface = ({
                       
                       {/* Follow-up Suggestions */}
                       {turn.followUpSuggestions && turn.followUpSuggestions.length > 0 && (
-                        <div className="mt-3 pt-2 border-t border-gray-200">
-                          <p className="text-xs font-medium text-gray-700 mb-2">Ask me about:</p>
+                        <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-600">
+                          <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Ask me about:</p>
                           <div className="space-y-1">
                             {turn.followUpSuggestions.map((suggestion, i) => (
                               <button
                                 key={i}
                                 onClick={() => handleSuggestedQuestion(suggestion)}
-                                className="block text-left text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded w-full transition-colors"
+                                className="flex items-center gap-1 text-left text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 px-2 py-1 rounded w-full transition-colors"
                                 disabled={isLoading}
                               >
-                                💬 {suggestion}
+                                <MessageCircle className="w-3 h-3 flex-shrink-0" />
+                                {suggestion}
                               </button>
                             ))}
                           </div>
@@ -317,8 +331,8 @@ const AIEducationInterface = ({
                       
                       {/* Confidence Level */}
                       {turn.confidenceLevel && (
-                        <div className="mt-2 pt-1 border-t border-gray-200">
-                          <div className="flex items-center justify-between text-xs text-gray-600">
+                        <div className="mt-2 pt-1 border-t border-gray-200 dark:border-gray-600">
+                          <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                             <span>Confidence: {turn.confidenceLevel}%</span>
                             <span>{new Date(turn.timestamp).toLocaleTimeString()}</span>
                           </div>
@@ -337,13 +351,16 @@ const AIEducationInterface = ({
       {/* Suggested Questions (show only when no conversation) */}
       {conversation.length === 0 && suggestedQuestions.length > 0 && (
         <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-2">💡 Try asking:</p>
+          <div className="flex items-center gap-1 mb-2">
+            <Lightbulb className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Try asking:</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {suggestedQuestions.slice(0, 4).map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestedQuestion(question)}
-                className="text-left text-sm text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors"
+                className="text-left text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/30 px-3 py-2 rounded-lg transition-colors"
                 disabled={isLoading}
               >
                 {question}
@@ -355,13 +372,16 @@ const AIEducationInterface = ({
 
       {/* Error Display */}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600">⚠️ {error}</p>
+        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/50 rounded-lg">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
         </div>
       )}
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="border-t pt-4">
+      <form onSubmit={handleSubmit} className="border-t dark:border-gray-700/50 pt-4">
         <div className="flex space-x-2">
           <div className="flex-1">
             <textarea
@@ -369,7 +389,7 @@ const AIEducationInterface = ({
               value={currentQuestion}
               onChange={handleTextareaChange}
               placeholder="Ask about the climate data... (e.g., 'How has temperature changed in my area?')"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               rows={1}
               disabled={isLoading}
               onKeyPress={(e) => {
@@ -383,16 +403,19 @@ const AIEducationInterface = ({
           <button
             type="submit"
             disabled={!currentQuestion.trim() || isLoading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              'Ask'
+              <div className="flex items-center gap-1">
+                <Send className="w-4 h-4" />
+                Ask
+              </div>
             )}
           </button>
         </div>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Press Enter to send, Shift+Enter for new line
         </p>
       </form>
